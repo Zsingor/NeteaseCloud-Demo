@@ -17,7 +17,8 @@
     "postcss-pxtorem": "^6.1.0",
     "vant": "^4.9.3",
     "vue": "^3.4.31",
-    "vue-router": "^4.4.1"
+    "vue-router": "^4.4.1",
+    "vue3-marquee": "^4.2.1"
   },
   "devDependencies": {
     "@iconify-json/ri": "^1.1.21",

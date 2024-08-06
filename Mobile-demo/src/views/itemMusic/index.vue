@@ -15,7 +15,7 @@ import {
   getMusicItemDetails,
   getMusicItemList,
 } from '../../request/api/itemMusic'
-import useItemMusicStore from '@/stores/music'
+import {useItemMusicStore} from '@/stores/music'
 
 defineOptions({
   name: 'ItemMusic',

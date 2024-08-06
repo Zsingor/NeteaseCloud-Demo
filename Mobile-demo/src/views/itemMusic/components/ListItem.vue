@@ -39,6 +39,10 @@
 </template>
 
 <script setup>
+import { useMusicPlayStore } from '@/stores/music'
+
+const playStore = useMusicPlayStore()
+
 const props = defineProps({
   itemlist: {
     default: () => ([]),
@@ -48,6 +52,12 @@ const props = defineProps({
     default: 0,
   },
 })
+
+//播放音乐
+const playMusic = (i) => {
+  playStore.updatePlayListIndex(i)
+  playStore.updatePlayList(props.itemlist)
+}
 </script>
 
 <style scoped lang='less'>

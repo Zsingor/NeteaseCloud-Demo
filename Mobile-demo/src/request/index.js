@@ -2,7 +2,7 @@ import axios from "axios";
 
 //创建一个新的axios对象
 const request = axios.create({
-    baseURL:"http://localhost:3000", //后端的ip地址
+    baseURL:import.meta.env.VITE_BASE_API, //后端的ip地址
     timeout: 6000 //响应时间
 })
 
