@@ -21,7 +21,8 @@
             <img :src="item.picUrl" alt="" />
             <span class="playCount">
               <IconMainPlay />
-              {{ changeCount(item.playCount) }}
+              <span>{{ changeCount(item.playCount) }}</span>
+              
             </span>
             <span class="name">{{ item.name }}</span>
           </router-link>
@@ -102,8 +103,14 @@ onMounted(async () => {
       color: #ffffff;
       display: flex;
       justify-content: center;
+      align-items: center;
       top: 7px;
       right: 7%;
+
+      span{
+        margin-top: 2px;
+        margin-left: 2px;
+      }
     }
 
     .name {

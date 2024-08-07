@@ -23,7 +23,8 @@
         <IconDetailShare />
       </div>
     </div>
-    <div class="detailContent">
+
+    <div class="detailContent" v-show="!showLyric">
       <img
         src="@/assets/imgs/needle-ab.png"
         alt=""
@@ -32,6 +33,7 @@
       />
       <img src="@/assets/imgs/cd.png" alt="" class="img_cd" />
       <img
+        @click="showLyric = true"
         :src="musicInfo.al.picUrl"
         alt=""
         class="img_music"
@@ -42,6 +44,22 @@
       />
     </div>
 
+    <div
+      class="musicLyric"
+      @click="showLyric = false"
+      ref="lyricRef"
+      v-show="showLyric"
+    >
+      <span
+        class="lyricItem"
+        v-for="(item, index) in getLyric"
+        :class="{ active: activeFlag(item, index) }"
+        :key="index"
+      >
+        {{ item.lrc }}
+      </span>
+    </div>
+
     <div class="detailFooter">
       <div class="footerTop">
         <IconDetailLike class="icon" />
@@ -50,17 +68,38 @@
         <IconDetailCommend class="icon" />
         <IconDetailCircle class="icon" />
       </div>
-      <div class="footerMid"></div>
+
+      <div class="footerMid">
+        <input
+          type="range"
+          class="range"
+          min="0"
+          :max="playStore.duration"
+          v-model="playStore.currentTime"
+          @input="changeValue"
+        />
+      </div>
+
       <div class="footerBottom">
         <IconDetailBack class="icon" />
-        <IconDetailDownload class="icon" />
+        <IconDetailPrevious
+          @click="playStore.changePlayListIndex(-1)"
+          class="icon"
+        />
         <IconDetailPlay
-          v-if="!playStore.isPlay"
+          v-show="!playStore.isPlay"
           @click="playMusic"
           class="icon play"
         />
-        <IconDetailPause v-else @click="playMusic" class="icon play" />
-        <IconDetailCommend class="icon" />
+        <IconDetailPause
+          v-show="playStore.isPlay"
+          @click="playMusic"
+          class="icon play"
+        />
+        <IconDetailNext
+          @click="playStore.changePlayListIndex(1)"
+          class="icon"
+        />
         <IconDetailList class="icon" />
       </div>
     </div>
@@ -68,8 +107,11 @@
 </template>
 
 <script setup>
-import { onMounted } from 'vue'
+import { computed, onMounted, reactive, ref, watch,defineEmits  } from 'vue'
 import { useMusicPlayStore } from '@/stores/music'
+import { storeToRefs } from 'pinia'
+
+const emit = defineEmits(['clickProgress']);
 
 const props = defineProps({
   musicInfo: {
@@ -85,15 +127,77 @@ const props = defineProps({
 })
 
 const playStore = useMusicPlayStore()
+const lyricRef = ref(null)
+
+let { lyricList } = storeToRefs(playStore)
+
+//是否显示歌词
+let showLyric = ref(false)
+//当前播放到的歌词序号
+let currentIndex = ref(0)
 
 //关闭详情页
 const closeDetails = () => {
   playStore.updateDetailShow(false)
 }
 
-onMounted(() => {
-//   console.log(props.musicInfo)
+//拖动进度条时的事件
+const changeValue = (value) => {
+  emit('clickProgress');
+}
+
+//判断当前是否播放到该句歌词
+const activeFlag = (value, index) => {
+  let currentTime = playStore.currentTime * 1000
+  if (currentTime > value.time) {
+    if (currentTime < value.next || value.next === -1) {
+      currentIndex.value = index
+      return true
+    }
+  }
+  return false
+}
+
+//返回歌词数组
+const getLyric = computed(() => {
+  let lyricArr = []
+  if (lyricList.value) {
+    lyricList.value.lyric.split(/[(\r\n)\r\n]+/).forEach((item) => {
+      let min = item.slice(1, 3)
+      let sec = item.slice(4, 6)
+      let mill = item.slice(7, item.indexOf(']'))
+      let lrc = item.slice(item.indexOf(']') + 1, item.length)
+      let time =
+        parseInt(min) * 60 * 1000 + parseInt(sec) * 1000 + parseInt(mill)
+      if (lrc !== '') {
+        lyricArr.push({ min, sec, mill, lrc, time })
+      }
+    })
+    lyricArr.forEach((item, index) => {
+      if (index === lyricArr.length - 1) {
+        item.next = -1
+      } else {
+        item.next = lyricArr[index + 1].time
+      }
+    })
+  }
+  // console.log(lyricArr)
+  return lyricArr
 })
+
+watch(
+  () => currentIndex.value,
+  (value) => {
+    let cur = document.querySelector('.lyricItem.active')
+    if (cur && lyricRef.value && cur.offsetTop > 300) {
+      lyricRef.value.scrollTop = cur.offsetTop - 250
+      // console.log(lyricRef.value.scrollTop);
+      // console.log(cur.offsetTop);
+    }
+  }
+)
+
+onMounted(() => {})
 </script>
 
 <style scoped lang='less'>
@@ -136,6 +240,7 @@ onMounted(() => {
 
       .author {
         color: #ffffff;
+        margin-right: 5px;
       }
 
       .icon {
@@ -208,6 +313,39 @@ onMounted(() => {
   }
 }
 
+.musicLyric {
+  width: 100%;
+  height: 570px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 10px;
+  overflow-y: scroll;
+  overflow-x: hidden;
+  scroll-behavior: smooth;
+
+  .lyricItem {
+    font-size: 20px;
+    color: rgb(190, 181, 181);
+    margin-bottom: 35px;
+    width: 90%;
+    display: flex;
+    justify-content: center;
+    white-space: nowrap;
+    overflow: hidden;
+    min-height: 40px;
+  }
+
+  .active {
+    color: #fff;
+    font-size: 30px;
+  }
+}
+
+.musicLyric::-webkit-scrollbar {
+  display: none;
+}
+
 .detailFooter {
   width: 100%;
   height: 180px;
@@ -228,10 +366,20 @@ onMounted(() => {
       fill: rgb(245, 234, 234);
     }
   }
-  .range {
-    width: 100%;
-    height: 3px;
+
+  .footerMid {
+    display: flex;
+    justify-content: center;
+    .progress {
+      width: 90%;
+    }
+
+    .range {
+      width: 90%;
+      height: 3px;
+    }
   }
+
   .footerBottom {
     width: 100%;
     height: 50px;
@@ -248,5 +396,33 @@ onMounted(() => {
       height: 50px;
     }
   }
+}
+
+[type="range"] {
+    -webkit-appearance: none;
+    appearance: none;
+    margin: 0;
+    outline: 0;
+    background-color: transparent;
+    width: 100%;
+}
+[type="range"]::-webkit-slider-runnable-track {
+    height: 4px;
+    background: #eee;
+}
+[type="range" i]::-webkit-slider-container {
+    height: 20px;
+    overflow: hidden;
+}
+[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background-color: #f44336;
+    border: 1px solid transparent;
+    margin-top: -8px;
+    border-image: linear-gradient(#f44336,#f44336) 0 fill / 8 20 8 0 / 0px 0px 0 2000px;
 }
 </style>

@@ -39,6 +39,12 @@ export const useMusicPlayStore = defineStore('musicPlay', {
         isPlay: false,
         //是否显示歌曲详情页
         detailShow: false,
+        //歌曲的歌词
+        lyricList:{},
+        //当前播放时间
+        currentTime:0,
+        //歌曲总时长
+        duration:0,
     }),
     //相当于methods
     actions: {
@@ -51,15 +57,30 @@ export const useMusicPlayStore = defineStore('musicPlay', {
         updatePlayListIndex(value) {
             this.playListIndex = value
         },
+        //上一首/下一首
+        changePlayListIndex(value){
+            let temp=this.playListIndex+value
+            temp=temp%this.playList.length
+            if(temp<0)
+            {
+                temp=this.playList.length-1
+            }
+            this.playListIndex=temp
+        },
         //修改detailShow的值
         updateDetailShow(value) {
             this.detailShow = value
         },
-        //获取歌词
+        //修改currentTime的值
+        updateCurrentTime(value) {
+            this.currentTime = value
+        },
+        //获取歌词并更新
         getLyric: async function (value) {
             let res = await getMusicLyric(value)
-            console.log(res);
-        }
+            this.lyricList=res.lrc
+        },
+        
     },
     persist: {
         key: 'musicPlay',
