@@ -40,11 +40,13 @@ export const useMusicPlayStore = defineStore('musicPlay', {
         //是否显示歌曲详情页
         detailShow: false,
         //歌曲的歌词
-        lyricList:{},
+        lyricList: {},
         //当前播放时间
-        currentTime:0,
+        currentTime: 0,
         //歌曲总时长
-        duration:0,
+        duration: 0,
+        //是否显示底部组件
+        isFooterShow:true,
     }),
     //相当于methods
     actions: {
@@ -53,19 +55,29 @@ export const useMusicPlayStore = defineStore('musicPlay', {
         updatePlayList(value) {
             this.playList = value
         },
+        //往playList中指定位置插入值
+        insertPlayList(value) {
+            let pos=this.playList.indexOf(value)
+            if (pos == -1) {
+                this.playList.splice(this.playListIndex+1, 0, value)
+                this.playListIndex++
+            }
+            else{
+                this.playListIndex=pos
+            }
+        },
         //修改PlayListIndex的值
         updatePlayListIndex(value) {
             this.playListIndex = value
         },
         //上一首/下一首
-        changePlayListIndex(value){
-            let temp=this.playListIndex+value
-            temp=temp%this.playList.length
-            if(temp<0)
-            {
-                temp=this.playList.length-1
+        changePlayListIndex(value) {
+            let temp = this.playListIndex + value
+            temp = temp % this.playList.length
+            if (temp < 0) {
+                temp = this.playList.length - 1
             }
-            this.playListIndex=temp
+            this.playListIndex = temp
         },
         //修改detailShow的值
         updateDetailShow(value) {
@@ -78,13 +90,44 @@ export const useMusicPlayStore = defineStore('musicPlay', {
         //获取歌词并更新
         getLyric: async function (value) {
             let res = await getMusicLyric(value)
-            this.lyricList=res.lrc
+            this.lyricList = res.lrc
         },
-        
     },
     persist: {
         key: 'musicPlay',
         storage: localStorage,
         paths: null,
+    },
+})
+
+export const useUserInfoStore = defineStore('userInfo', {
+    state: () => ({
+        //用户是否登录
+        isLogin:false,
+        //用户id
+        userId:"",
+        //搜索历史
+        searchHistory: [],
+        //用户数据
+        infomation:{},
+    }),
+    actions: {
+        //添加搜索历史
+        setSearchHistory(value) {
+            this.searchHistory.unshift(value)
+            this.searchHistory = [...new Set(this.searchHistory)]
+            if (this.searchHistory.length > 8) {
+                this.searchHistory.pop()
+            }
+        },
+        //清空搜索历史
+        emptySearchHistory() {
+            this.searchHistory.length = 0
+        }
+    },
+    persist: {
+        key: 'userInfo', //存储名称
+        storage: localStorage, // 存储方式 sessionStorage/localStorage
+        paths: null, //指定 state 中哪些数据需要被持久化。[] 表示不持久化任何状态，undefined 或 null 表示持久化整个 state
     },
 })

@@ -52,7 +52,7 @@
 import MusicDetail from '@/components/MusicDetail.vue'
 import { useMusicPlayStore } from '@/stores/music'
 import { storeToRefs } from 'pinia'
-import { nextTick, onMounted, onUpdated, ref, watch } from 'vue'
+import { onMounted, onUpdated, ref, watch } from 'vue'
 
 const playStore = useMusicPlayStore()
 const audioRef = ref(null)
@@ -101,7 +101,6 @@ const handleTouchStart = (e) => {
 //监听滑动事件
 const handleTouchMove = (e) => {
   const touchCurrentX = e.touches[0].pageX
-  // console.log(touchCurrentX,"  ",touchStartX.value);
   if (touchFlag.value) {
     if (touchCurrentX < touchStartX.value - 30) {
       playStore.changePlayListIndex(1)

@@ -28,7 +28,7 @@ export default defineConfig({
             system: 'system-uicons'
           },
           // 标识自定义图标集
-          customCollections: ['main','item','footer','detail']
+          customCollections: ['main','item','footer','detail','search']
         }),
         // Vant自动引入解析器
         VantResolver()
@@ -45,6 +45,7 @@ export default defineConfig({
         item: FileSystemIconLoader('./src/assets/svg/itemMusic', svg => svg.replace(/^<svg /, '<svg fill="currentColor" ')),
         footer: FileSystemIconLoader('./src/assets/svg/footer', svg => svg.replace(/^<svg /, '<svg fill="currentColor" ')),
         detail: FileSystemIconLoader('./src/assets/svg/detail', svg => svg.replace(/^<svg /, '<svg fill="currentColor" ')),
+        search: FileSystemIconLoader('./src/assets/svg/search', svg => svg.replace(/^<svg /, '<svg fill="currentColor" ')),
       }
      }),
   ],

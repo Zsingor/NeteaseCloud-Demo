@@ -181,7 +181,6 @@ const getLyric = computed(() => {
       }
     })
   }
-  // console.log(lyricArr)
   return lyricArr
 })
 
@@ -191,8 +190,6 @@ watch(
     let cur = document.querySelector('.lyricItem.active')
     if (cur && lyricRef.value && cur.offsetTop > 300) {
       lyricRef.value.scrollTop = cur.offsetTop - 250
-      // console.log(lyricRef.value.scrollTop);
-      // console.log(cur.offsetTop);
     }
   }
 )

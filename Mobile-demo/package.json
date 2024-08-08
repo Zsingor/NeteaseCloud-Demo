@@ -15,6 +15,7 @@
     "pinia": "^2.2.0",
     "pinia-plugin-persistedstate": "^3.2.1",
     "postcss-pxtorem": "^6.1.0",
+    "qrcode.vue": "^3.4.1",
     "vant": "^4.9.3",
     "vue": "^3.4.31",
     "vue-router": "^4.4.1",
