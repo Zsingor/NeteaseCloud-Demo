@@ -56,6 +56,10 @@ export default defineConfig({
     },
   },
 
+  server:{
+    port:7040
+  },
+
   css: {
     postcss: {
       plugins: [
